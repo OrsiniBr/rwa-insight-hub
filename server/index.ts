@@ -1,4 +1,4 @@
-// New File
+// Index.ts
 import express from "express";
 const app = express();
 const PORT = process.env.PORT || 3000;
