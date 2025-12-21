@@ -22,6 +22,8 @@ contract PoolRegistry is Ownable {
     event PoolCreated(bytes32 indexed poolId, string name);
     event AssetAddedToPool(bytes32 indexed poolId, bytes32 indexed assetId);
 
+    constructor() Ownable(msg.sender) {}
+
     /// @notice Create a new pool
     function createPool(bytes32 poolId, string calldata name) external onlyOwner {
         require(!pools[poolId].exists, "Pool exists");

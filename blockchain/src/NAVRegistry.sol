@@ -20,6 +20,9 @@ contract NavRegistry is Ownable {
     event AssetAdded(bytes32 indexed assetId, string name, string symbol);
     event NavUpdated(bytes32 indexed assetId, uint256 oldNav, uint256 newNav);
 
+    constructor() Ownable(msg.sender) {}
+
+
     /// @notice Add a new asset
     function addAsset(bytes32 assetId, string calldata name, string calldata symbol) external onlyOwner {
         require(!assets[assetId].exists, "Asset exists");
