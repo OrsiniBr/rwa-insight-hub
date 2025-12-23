@@ -1,32 +1,83 @@
-import fetch from "node-fetch";
 import Token from "../models/token.model";
+import { ExplorerResponse, TokenItem } from "../types";
+
+const BASE_URL = "https://explorer.mantle.xyz/api/v2/tokens";
 
 class MantleService {
-    async fetchMantleTokens(): Promise<any[]> {
-        const response = await fetch(
-            "https://api.coingecko.com/api/v3/coins/list?include_platform=true"
-        );
 
-        const tokens = (await response.json()) as any[];
+async fetchTopMantleTokens(): Promise<TokenItem[]> {
+  try {
+    const allTokens: TokenItem[] = [];
+    let params = "";
+    let pageCount = 0;
 
-        return tokens.filter((token) => token.platforms?.mantle);
+    while (pageCount < 3) { 
+      const res = await fetch(`${BASE_URL}${params}`);
+      const data: ExplorerResponse = (await res.json()) as ExplorerResponse;
+
+      allTokens.push(...data.items);
+
+      if (!data.next_page_params) break;
+
+      const p = data.next_page_params;
+      params = `?contract_address_hash=${p.contract_address_hash}&items_count=${p.items_count}`;
+      pageCount++;
     }
 
-    async saveTokens(tokens: any[]): Promise<void> {
-        for (const token of tokens) {
-            await Token.upsert({
-                coingeckoId: token.id,
-                symbol: token.symbol,
-                name: token.name,
-                address: token.platforms.mantle,
-                network: "mantle",
-            });
-        }
-    }
+    const filtered = allTokens
+      .filter(
+        (t) =>
+          t.type === "ERC-20" &&
+          t.exchange_rate !== null &&
+          t.circulating_market_cap !== null
+      )
+      .sort(
+        (a, b) =>
+          Number(b.circulating_market_cap) - Number(a.circulating_market_cap)
+      )
+      .slice(0, 100);
 
-    async getTokensFromDB(): Promise<any[]> {
-        return Token.findAll({ where: { network: "mantle" } });
-    }
+    return filtered;
+  } catch (error) {
+    console.error("Failed to fetch top Mantle tokens:", error);
+    return [];
+  }
+}
+  async saveTokens(tokens: any[]): Promise<void> {
+    const records = tokens.map((t) => ({
+      address: t.address,
+      symbol: t.symbol,
+      name: t.name,
+      decimals: Number(t.decimals),
+      priceUsd: Number(t.exchange_rate),
+      circulatingMarketCap: Number(t.circulating_market_cap),
+      totalSupply: t.total_supply,
+      holders: Number(t.holders),
+      iconUrl: t.icon_url,
+      type: t.type,
+      network: "mantle",
+    }));
+
+    await Token.bulkCreate(records, {
+      updateOnDuplicate: [
+        "symbol",
+        "name",
+        "priceUsd",
+        "circulatingMarketCap",
+        "holders",
+        "iconUrl",
+        "totalSupply"
+      ],
+    });
+  }
+
+  async getTokensFromDB(): Promise<any[]> {
+    return Token.findAll({
+      where: { network: "mantle" },
+      order: [["circulatingMarketCap", "DESC"]],
+      limit: 100,
+    });
+  }
 }
 
 export default new MantleService();

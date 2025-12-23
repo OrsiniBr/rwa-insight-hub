@@ -1,2 +1,5 @@
 node_modules
 .env
+/dist
+pnpm-lock.yaml
+pnpm-workspace.yaml

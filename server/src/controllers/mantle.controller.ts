@@ -1,17 +1,17 @@
 import mantleService from "../services/mantle.service";
+import ApiResponse from "../utils/apiResponse";
+import { Request, Response } from "express";
 
-export const getMantleTokens = async (req, res) => {
+export const getMantleTokens = async (_req: Request, res: Response) => {
     try {
         let tokens = await mantleService.getTokensFromDB();
-
         if (!tokens.length) {
-            const fetchedTokens = await mantleService.fetchMantleTokens();
+            const fetchedTokens = await mantleService.fetchTopMantleTokens();
             await mantleService.saveTokens(fetchedTokens);
             tokens = await mantleService.getTokensFromDB();
         }
-
-        res.json(tokens);
+        return ApiResponse.success(res,tokens,200);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        return ApiResponse.error(res,400,error,error instanceof Error? error.message: "Something went wrong");
     }
 };
