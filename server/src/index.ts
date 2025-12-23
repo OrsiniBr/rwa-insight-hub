@@ -5,6 +5,7 @@ import { Config } from "./config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import dotenv from "dotenv";
 import logger from "./config/logger";
+import mantleCron from "./utils/cronJobs";
 
 dotenv.config({
   path: process.env.NODE_ENV === "development" ? ".env" : ".env.test",
@@ -34,6 +35,7 @@ async function bootstrap(app: Application): Promise<void> {
       port: Config.PORT,
     });
     await initDB();
+     
     app.listen(Config.PORT, () => {
       logger.info(`Server started successfully`, {
         port: Config.PORT,
@@ -41,6 +43,8 @@ async function bootstrap(app: Application): Promise<void> {
         url: `http://localhost:${Config.PORT}`,
       });
     });
+      
+    mantleCron.start();  
   } catch (error: any) {
     logger.error("Failed to start application", {
       error: error.message,
