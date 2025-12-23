@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../types';
 import dotenv from "dotenv";
-import logger from './logger';
+import logger from '../config/logger';
 
 dotenv.config();
 
