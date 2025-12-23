@@ -1,7 +1,8 @@
 import mantleService from "../services/mantle.service";
 import ApiResponse from "../utils/apiResponse";
+import { Request, Response } from "express";
 
-export const getMantleTokens = async (_req, res) => {
+export const getMantleTokens = async (_req: Request, res: Response) => {
     try {
         let tokens = await mantleService.getTokensFromDB();
         if (!tokens.length) {

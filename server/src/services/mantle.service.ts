@@ -1,48 +1,48 @@
 import Token from "../models/token.model";
-import InsightHubException from "../exception";
+import { ExplorerResponse, TokenItem } from "../types";
 
 const BASE_URL = "https://explorer.mantle.xyz/api/v2/tokens";
 
 class MantleService {
-  async fetchTopMantleTokens(): Promise<any[]> {
-    try {
-      const allTokens: any[] = [];
-      let params = "";
 
-      for (let i = 0; i < 3; i++) {
-        const res = await fetch(`${BASE_URL}${params}`);
-        const data = await res.json();
+async fetchTopMantleTokens(): Promise<TokenItem[]> {
+  try {
+    const allTokens: TokenItem[] = [];
+    let params = "";
+    let pageCount = 0;
 
-        allTokens.push(...data.items);
+    while (pageCount < 3) { 
+      const res = await fetch(`${BASE_URL}${params}`);
+      const data: ExplorerResponse = (await res.json()) as ExplorerResponse;
 
-        if (!data.next_page_params) break;
+      allTokens.push(...data.items);
 
-        const p = data.next_page_params;
-        params = `?contract_address_hash=${p.contract_address_hash}&items_count=${p.items_count}`;
-      }
+      if (!data.next_page_params) break;
 
-      const filtered = allTokens
-        .filter(
-          (t) =>
-            t.type === "ERC-20" &&
-            t.exchange_rate !== null &&
-            t.circulating_market_cap !== null
-        )
-        .sort(
-          (a, b) =>
-            Number(b.circulating_market_cap) -
-            Number(a.circulating_market_cap)
-        )
-        .slice(0, 100);
-
-      return filtered;
-    } catch (error) {
-      throw new InsightHubException(
-        error instanceof Error ? error.message : String(error)
-      );
+      const p = data.next_page_params;
+      params = `?contract_address_hash=${p.contract_address_hash}&items_count=${p.items_count}`;
+      pageCount++;
     }
-  }
 
+    const filtered = allTokens
+      .filter(
+        (t) =>
+          t.type === "ERC-20" &&
+          t.exchange_rate !== null &&
+          t.circulating_market_cap !== null
+      )
+      .sort(
+        (a, b) =>
+          Number(b.circulating_market_cap) - Number(a.circulating_market_cap)
+      )
+      .slice(0, 100);
+
+    return filtered;
+  } catch (error) {
+    console.error("Failed to fetch top Mantle tokens:", error);
+    return [];
+  }
+}
   async saveTokens(tokens: any[]): Promise<void> {
     const records = tokens.map((t) => ({
       address: t.address,
