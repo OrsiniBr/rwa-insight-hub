@@ -5,7 +5,7 @@ export const getMantleTokens = async (_req, res) => {
     try {
         let tokens = await mantleService.getTokensFromDB();
         if (!tokens.length) {
-            const fetchedTokens = await mantleService.fetchMantleTokens();
+            const fetchedTokens = await mantleService.fetchTopMantleTokens();
             await mantleService.saveTokens(fetchedTokens);
             tokens = await mantleService.getTokensFromDB();
         }
