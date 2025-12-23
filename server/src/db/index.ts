@@ -1,18 +1,17 @@
 import { Sequelize } from "sequelize";
+import { Config } from "../config";
 
-import BetterSQLite3 from "better-sqlite3";
 
-export const db = new Sequelize({
-    dialect: "sqlite",
-    storage: ":memory:",
+export const db = new Sequelize(Config.DB_NAME,Config.DB_USER,Config.DB_PASSWORD,{
+    dialect: "postgres",    
     logging: false,
-    dialectModule: BetterSQLite3,
+    host : "localhost"
 });
 
 export const initDB = async () => {
     try {
         await db.authenticate();
-        console.log("Database connected!");
+        console.log("Database connection established successfully!");
         await db.sync({ force: false });
         console.log("Tables synced!");
     } catch (error) {
