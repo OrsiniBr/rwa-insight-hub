@@ -6,6 +6,7 @@ import { errorHandler } from "./middlewares/errorHandler.middleware";
 import dotenv from "dotenv";
 import logger from "./config/logger";
 import mantleCron from "./utils/cronJobs";
+import cors from "cors";
 
 dotenv.config({
   path: process.env.NODE_ENV === "development" ? ".env" : ".env.test",
@@ -15,6 +16,14 @@ dotenv.config({
 
 const app = express();
 
+app.use(
+	cors({
+		origin: [process.env.FRONTEND_URL??"http://localhost:3000","http://localhost:8080"],
+		methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+		credentials: true
+	})
+);
 app.use(express.json());
 app.use("/api/v1", router);
 app.use((req, res) => {
