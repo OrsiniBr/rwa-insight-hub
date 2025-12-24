@@ -2,17 +2,17 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {NAVRegistry} from "../src/NAVRegistry.sol";
+import {PoolRegistry} from "../src/PoolRegistry.sol";
 
 contract NAVRegistryScript is Script {
-    NAVRegistry public navRegistry;
+    PoolRegistry public poolRegistry;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        navRegistry = new NAVRegistry();
+        poolRegistry = new PoolRegistry();
 
         vm.stopBroadcast();
     }
