@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @title NavRegistry
 /// @notice Tracks asset NAVs. Backend updates NAVs.
-contract NavRegistry is Ownable {
+contract NAVRegistry is Ownable {
     struct Asset {
         string name;
         string symbol;
