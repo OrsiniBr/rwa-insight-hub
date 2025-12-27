@@ -28,9 +28,6 @@ Real-time NAV transparency dashboard for tokenized RWA pools on Mantle Network w
 
 ```typescript
 // Test crypto prices
-import { fetchCryptoPrices } from "@/lib/price-api";
-const prices = await fetchCryptoPrices(["BTC", "ETH"]);
-console.log("BTC:", prices.get("BTC")?.currentPrice);
 
 // Test Mantle transactions
 import { fetchLatestTransactions } from "@/lib/mantle-api";

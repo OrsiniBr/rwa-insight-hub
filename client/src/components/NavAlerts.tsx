@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bell, ArrowUpRight, ArrowDownRight, X } from "lucide-react";
-import { Pool } from "@/lib/realtime-data";
+import { Pool } from "@/hooks/useRealtimeData";
 import { cn } from "@/lib/utils";
 
 interface Alert {

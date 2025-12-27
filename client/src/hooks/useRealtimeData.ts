@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { fetchCryptoPrices, AssetPrice, getTreasuryRates } from "@/lib/price-api";
+import {  AssetPrice, getTreasuryRates } from "@/lib/price-api";
 import { 
   fetchLatestTransactions, 
   fetchLatestBlocks, 
@@ -19,7 +19,7 @@ export interface Pool {
   latestNav: number;
   previousNav: number;
   change24h: number;
-  status: "Healthy" | "Needs Review" | "Stale Data";
+  status:string;
   lastUpdated: string;
   minutesAgo: number;
   priceData?: AssetPrice;
@@ -432,3 +432,7 @@ export function usePoolRealtimeData(poolId: string) {
     lastPriceUpdate,
   };
 }
+function fetchCryptoPrices(cryptoSymbols: string[]): any {
+  throw new Error("Function not implemented.");
+}
+

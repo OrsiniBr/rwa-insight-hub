@@ -11,7 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowUpRight, ArrowDownRight, GitCompare } from "lucide-react";
-import { Pool } from "@/lib/realtime-data";
+import { Pool } from "@/hooks/useRealtimeData";
 import { cn } from "@/lib/utils";
 
 interface PoolComparisonProps {
