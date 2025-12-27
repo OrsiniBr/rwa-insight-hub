@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Wallet, FileText, Code } from "lucide-react";
 import { NavAlerts } from "./NavAlerts";
-import { useRealtimeData } from "@/hooks/useRealtimeData";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useMantleTokens } from "@/hooks/useMantleToken";
 
 export function Navbar() {
-  const { pools } = useRealtimeData();
+  const { pools } = useMantleTokens();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">

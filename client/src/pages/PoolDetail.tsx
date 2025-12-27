@@ -9,12 +9,15 @@ import { ChainlinkDataFeeds } from "@/components/ChainlinkDataFeeds";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { useRealtimeData } from "@/hooks/useRealtimeData";
+// import { useRealtimeData } from "@/hooks/useRealtimeData";
+import { useMantleTokens } from "@/hooks/useMantleToken";
+import { formatLargeNumber } from "@/components/StatsCard";
 
 const PoolDetail = () => {
   const { poolId } = useParams<{ poolId: string }>();
   const navigate = useNavigate();
-  const { pools } = useRealtimeData();
+  // const { pools } = useRealtimeData();
+  const { pools } = useMantleTokens()
 
   const pool = pools.find((p) => p.id === poolId);
 
@@ -32,12 +35,12 @@ const PoolDetail = () => {
     );
   }
 
-  const formatValue = (value: number) => {
-    if (value >= 1000000) return `$${(value / 1000000).toFixed(2)}M`;
-    if (value >= 1000) return `$${(value / 1000).toFixed(2)}K`;
-    if (value < 0.01) return `$${value.toFixed(8)}`;
-    return `$${value.toFixed(2)}`;
-  };
+  // const formatValue = (value: number) => {
+  //   if (value >= 1000000) return `$${(value / 1000000).toFixed(2)}M`;
+  //   if (value >= 1000) return `$${(value / 1000).toFixed(2)}K`;
+  //   if (value < 0.01) return `$${value.toFixed(8)}`;
+  //   return `$${value.toFixed(2)}`;
+  // };
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,13 +83,13 @@ const PoolDetail = () => {
               <div>
                 <p className="text-[10px] text-muted-foreground mb-0.5">Latest NAV</p>
                 <p className="text-2xl font-bold text-foreground tabular-nums">
-                  {formatValue(pool.latestNav)}
+                  {formatLargeNumber(pool.latestNav)}
                 </p>
               </div>
 
               <div className="space-y-0.5">
                 <p className="text-[10px] text-muted-foreground">
-                  Prev: {formatValue(pool.previousNav)}
+                  Prev: {formatLargeNumber(pool.previousNav)}
                 </p>
                 <div className={`flex items-center gap-0.5 lg:justify-end text-xs font-medium ${
                   pool.change24h >= 0 ? "text-success" : "text-destructive"
