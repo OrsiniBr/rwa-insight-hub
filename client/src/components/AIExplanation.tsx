@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Clock, Shield } from "lucide-react";
-import { useRealtimeData } from "@/hooks/useRealtimeData";
+import { useMantleTokens } from "@/hooks/useMantleToken";
 
 interface AIExplanationProps {
   poolId: string;
 }
 
 export function AIExplanation({ poolId }: AIExplanationProps) {
-  const { pools } = useRealtimeData();
+  const { pools } = useMantleTokens();
   const [explanation, setExplanation] = useState("");
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [sourcesCount, setSourcesCount] = useState(5);

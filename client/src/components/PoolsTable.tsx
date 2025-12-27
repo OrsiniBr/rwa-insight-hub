@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Search, ArrowUpRight, ArrowDownRight, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Pool } from "@/lib/realtime-data";
+import { Pool } from "@/hooks/useRealtimeData";
 import { PoolComparison } from "./PoolComparison";
 
 interface PoolsTableProps {
@@ -48,19 +48,38 @@ export function PoolsTable({ pools }: PoolsTableProps) {
 
   const getStatusBadge = (status: Pool["status"]) => {
     switch (status) {
-      case "Healthy":
+      case "active":
         return <Badge variant="success" className="text-[10px]">{status}</Badge>;
-      case "Needs Review":
+      case "inactive":
         return <Badge variant="warning" className="text-[10px]">{status}</Badge>;
       case "Stale Data":
         return <Badge variant="destructive" className="text-[10px]">{status}</Badge>;
     }
   };
 
-  const getStatusDot = (minutesAgo: number) => {
-    if (minutesAgo < 60) return "status-dot status-healthy";
-    if (minutesAgo < 1440) return "status-dot status-warning";
+  const getStatusDot = (minutesAgo: string) => {
+    const convertToNumber = Number(minutesAgo)
+    if (convertToNumber < 60) return "status-dot status-healthy";
+    if (convertToNumber < 1440) return "status-dot status-warning";
     return "status-dot status-stale";
+  };
+
+   const getRelativeTime = (timestamp: string) => {
+    const now = new Date();
+    const updated = new Date(timestamp);
+    const diffInSeconds = Math.floor((now.getTime() - updated.getTime()) / 1000);
+
+    if (diffInSeconds < 10) return "just now";
+    if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes} min${diffInMinutes > 1 ? 's' : ''} ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
   };
 
   const formatValue = (value: number) => {
@@ -158,7 +177,7 @@ export function PoolsTable({ pools }: PoolsTableProps) {
                 </td>
                 <td className="px-4 py-2.5 text-right">
                   <span className="text-xs font-semibold text-foreground tabular-nums">
-                    {formatValue(pool.latestNav)}
+                    {formatValue(pool.priceData?.currentPrice || pool.unitPrice || pool.latestNav)}
                   </span>
                 </td>
                 <td className="px-4 py-2.5 text-right">
@@ -176,14 +195,14 @@ export function PoolsTable({ pools }: PoolsTableProps) {
                     {Math.abs(pool.change24h).toFixed(2)}%
                   </div>
                 </td>
-                <td className="px-4 py-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <div className={getStatusDot(pool.minutesAgo)} />
-                    <span className="text-[10px] text-muted-foreground">
-                      {pool.lastUpdated}
-                    </span>
-                  </div>
-                </td>
+           <td className="px-4 py-2.5">
+              <div className="flex items-center gap-1.5">
+                <div className={getStatusDot(`${pool.latestNav}`)} />
+                <span className="text-[10px] text-muted-foreground">
+                  {getRelativeTime(pool.lastUpdated)}  {/* ← Changed here */}
+                </span>
+              </div>
+            </td>
                 <td className="px-4 py-2.5">{getStatusBadge(pool.status)}</td>
                 <td className="px-4 py-2.5 text-right">
                   <Button

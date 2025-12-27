@@ -22,7 +22,7 @@ export interface AssetPrice {
   volume24h: number;
   high24h: number;
   low24h: number;
-  lastUpdated: Date;
+  lastUpdated: number;
 }
 
 // CORS proxy for API calls
@@ -51,97 +51,97 @@ const CURRENT_PRICES: Record<string, { price: number; change: number; high: numb
 
 /**
  * Fetch cryptocurrency prices - uses CORS proxy then fallback to current prices
- */
-export async function fetchCryptoPrices(symbols: string[]): Promise<Map<string, AssetPrice>> {
-  try {
-    const ids = symbols
-      .map(s => COINGECKO_IDS[s])
-      .filter(Boolean)
-      .join(",");
+//  */
+// export async function fetchCryptoPrices(symbols: string[]): Promise<Map<string, AssetPrice>> {
+//   try {
+//     const ids = symbols
+//       .map(s => COINGECKO_IDS[s])
+//       .filter(Boolean)
+//       .join(",");
     
-    if (!ids) {
-      return getFallbackCryptoPrices(symbols);
-    }
+//     if (!ids) {
+//       return getFallbackCryptoPrices(symbols);
+//     }
 
-    const url = `${COINGECKO_API_BASE}/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`;
+//     const url = `${COINGECKO_API_BASE}/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`;
     
-    const response = await fetch(CORS_PROXY + encodeURIComponent(url), {
-      headers: { 'Accept': 'application/json' },
-    });
+//     const response = await fetch(CORS_PROXY + encodeURIComponent(url), {
+//       headers: { 'Accept': 'application/json' },
+//     });
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`API error: ${response.status}`);
+//     }
 
-    const data = await response.json();
-    const prices = new Map<string, AssetPrice>();
+//     const data = await response.json();
+//     const prices = new Map<string, AssetPrice>();
     
-    for (const coin of data) {
-      const symbol = Object.entries(COINGECKO_IDS).find(([_, id]) => id === coin.id)?.[0];
-      if (symbol) {
-        prices.set(symbol, {
-          id: coin.id,
-          name: coin.name,
-          symbol: symbol,
-          currentPrice: coin.current_price,
-          priceChange24h: coin.price_change_24h,
-          priceChangePercentage24h: coin.price_change_percentage_24h,
-          marketCap: coin.market_cap,
-          volume24h: coin.total_volume,
-          high24h: coin.high_24h,
-          low24h: coin.low_24h,
-          lastUpdated: new Date(coin.last_updated),
-        });
-      }
-    }
+//     for (const coin of data) {
+//       const symbol = Object.entries(COINGECKO_IDS).find(([_, id]) => id === coin.id)?.[0];
+//       if (symbol) {
+//         prices.set(symbol, {
+//           id: coin.id,
+//           name: coin.name,
+//           symbol: symbol,
+//           currentPrice: coin.current_price,
+//           priceChange24h: coin.price_change_24h,
+//           priceChangePercentage24h: coin.price_change_percentage_24h,
+//           marketCap: coin.market_cap,
+//           volume24h: coin.total_volume,
+//           high24h: coin.high_24h,
+//           low24h: coin.low_24h,
+//           lastUpdated: new Date(coin.last_updated),
+//         });
+//       }
+//     }
     
-    return prices.size > 0 ? prices : getFallbackCryptoPrices(symbols);
-  } catch (error) {
-    console.warn("Using current market prices (API unavailable)");
-    return getFallbackCryptoPrices(symbols);
-  }
-}
+//     return prices.size > 0 ? prices : getFallbackCryptoPrices(symbols);
+//   } catch (error) {
+//     console.warn("Using current market prices (API unavailable)");
+//     return getFallbackCryptoPrices(symbols);
+//   }
+// }
 
 /**
  * Fetch a single cryptocurrency price
  */
-export async function fetchSingleCryptoPrice(symbol: string): Promise<AssetPrice | null> {
-  const prices = await fetchCryptoPrices([symbol]);
-  return prices.get(symbol) || null;
-}
+// export async function fetchSingleCryptoPrice(symbol: string): Promise<AssetPrice | null> {
+//   const prices = await fetchCryptoPrices([symbol]);
+//   return prices.get(symbol) || null;
+// }
 
-/**
- * Current market prices as of December 15, 2024
- */
-function getFallbackCryptoPrices(symbols: string[]): Map<string, AssetPrice> {
-  const prices = new Map<string, AssetPrice>();
-  const now = new Date();
+// /**
+//  * Current market prices as of December 15, 2024
+//  */
+// function getFallbackCryptoPrices(symbols: string[]): Map<string, AssetPrice> {
+//   const prices = new Map<string, AssetPrice>();
+//   const now = new Date();
 
-  for (const symbol of symbols) {
-    const data = CURRENT_PRICES[symbol];
-    if (data) {
-      // Add small random variation to simulate live updates
-      const variation = 1 + (Math.random() - 0.5) * 0.002;
-      const currentPrice = data.price * variation;
+//   for (const symbol of symbols) {
+//     const data = CURRENT_PRICES[symbol];
+//     if (data) {
+//       // Add small random variation to simulate live updates
+//       const variation = 1 + (Math.random() - 0.5) * 0.002;
+//       const currentPrice = data.price * variation;
       
-      prices.set(symbol, {
-        id: symbol.toLowerCase(),
-        name: symbol === "BTC" ? "Bitcoin" : symbol === "ETH" ? "Ethereum" : symbol === "SOL" ? "Solana" : symbol === "MNT" ? "Mantle" : "Chainlink",
-        symbol: symbol,
-        currentPrice: currentPrice,
-        priceChange24h: currentPrice * data.change / 100,
-        priceChangePercentage24h: data.change,
-        marketCap: data.marketCap,
-        volume24h: data.volume,
-        high24h: data.high,
-        low24h: data.low,
-        lastUpdated: now,
-      });
-    }
-  }
+//       prices.set(symbol, {
+//         id: symbol.toLowerCase(),
+//         name: symbol === "BTC" ? "Bitcoin" : symbol === "ETH" ? "Ethereum" : symbol === "SOL" ? "Solana" : symbol === "MNT" ? "Mantle" : "Chainlink",
+//         symbol: symbol,
+//         currentPrice: currentPrice,
+//         priceChange24h: currentPrice * data.change / 100,
+//         priceChangePercentage24h: data.change,
+//         marketCap: data.marketCap,
+//         volume24h: data.volume,
+//         high24h: data.high,
+//         low24h: data.low,
+//         lastUpdated: now,
+//       });
+//     }
+//   }
 
-  return prices;
-}
+//   return prices;
+// }
 
 /**
  * Calculate RWA pool NAV based on real asset prices
