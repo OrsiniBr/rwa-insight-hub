@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {Script, console} from "forge-std/Script.sol";
 import {PoolRegistry} from "../src/PoolRegistry.sol";
 
-contract NAVRegistryScript is Script {
+contract PoolRegistryScript is Script {
     PoolRegistry public poolRegistry;
 
     function setUp() public {}
