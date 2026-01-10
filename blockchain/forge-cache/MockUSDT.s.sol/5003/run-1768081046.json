@@ -1,0 +1,7 @@
+{
+  "transactions": [
+    {
+      "rpc": "https://endpoints.omniatech.io/v1/mantle/sepolia/public"
+    }
+  ]
+}
