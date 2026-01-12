@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -21,6 +21,7 @@ contract Reward is ReentrancyGuard, Pausable, Ownable {
     event RewardContractInitialized(address indexed rewardToken, uint256 timestamp);
     event RewardClaimedByUser(address indexed user, uint256 indexed rewardAmount, uint256 timestamp);
     event TotalNumberOfRewardClaimedByUser(address indexed user, uint256 indexed numberOfRewardClaimed, uint256 timestamp);
+    event RewardContractFunded(uint256 amount);
 
     constructor(address _rewardToken) Ownable(msg.sender) {
         require(_rewardToken != address(0), "Invalid token address");
@@ -82,6 +83,7 @@ contract Reward is ReentrancyGuard, Pausable, Ownable {
     function fundContract(uint256 _amount) external {
         require(_amount > 0, "Amount must be greater than 0");
         rewardToken.safeTransferFrom(msg.sender, address(this), _amount);
+        emit RewardContractFunded(_amount);
     }
 
     function emergencyWithdraw(uint256 _amount) external onlyOwner {

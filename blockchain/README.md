@@ -2,6 +2,8 @@ $MAINNET_RPC_URL --broadcast --verify -vvvv
 
 forge script script/Reward.s.sol:RewardScript --rpc-url $MANTLE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY
 
+forge script script/RewardScript.sol:RewardScript --rpc-url <YOUR_RPC_URL> --broadcast --verify -vvvv
+
 forge script script/LOTStaking.s.sol:LOTStakingScript --rpc-url $MAINNET_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY
 forge script script/LOTStaking.s.sol:LOTStakingScript --rpc-url $MAINNET_RPC_URL --private-key $PRIVATE_KEY 
 
