@@ -15,7 +15,57 @@ https://rwa-insight-hub.vercel.app/
 PoolRegistry  -  0x8BaCC14Db47cf7a68bFE10642b4c4d25eC576ccd
 https://mantlescan.xyz/address/0x8BaCC14Db47cf7a68bFE10642b4c4d25eC576ccd
 Mantle NAV Coprocessor
+Mantle NAV Coprocessor
 
+Introduction
+
+The Mantle NAV Coprocessor is an AI-powered transparency layer for Real World Assets (RWA) on the Mantle network. It automatically calculates and publishes the Net Asset Value (NAV) of RWA pools, making their valuation transparent, verifiable, and easily consumable by developers and investors.
+
+What is NAV?
+
+NAV (Net Asset Value) is the per‑share value of a fund or pool, calculated as the total value of underlying assets minus liabilities, divided by the number of shares. For RWA pools on Mantle, this means aggregating on‑chain token positions, oracle prices, and off‑chain factors like fees and FX rates into a single, trusted value.
+
+Problem Statement
+
+RWA pools on Mantle represent tokenized real‑world assets like treasury bills, real estate, and stablecoins, but their valuation remains opaque:
+
+Manual processes: Many rely on private spreadsheets or infrequent manual updates.
+
+Data silos: Positions are on‑chain, prices come from multiple oracles, and fees/FX live off‑chain.
+
+Trust gap: Investors cannot easily verify how NAV was computed or what data was used.
+
+Developer friction: No standardized, real‑time NAV feed for dApps to consume.
+
+This lack of transparency limits RWA adoption on Mantle despite its positioning as a liquidity chain for institutional assets.
+
+Solution
+
+The Mantle NAV Coprocessor bridges this gap with:
+
+Automated computation: An off‑chain AI agent pulls on‑chain positions, oracle prices, and off‑chain inputs, then calculates NAV.
+
+On‑chain publication: Writes the final NAV, timestamp, and data references to a NAVRegistry smart contract on Mantle.
+
+AI explanations: Generates human‑readable summaries of why NAV changed (e.g. “NAV up 2.1% due to treasury yields + USD strength”).
+
+Verifiable transparency: Anyone can inspect the NAV, its sources, and the on‑chain history.
+
+Flow:
+
+Agent periodically fetches:
+
+On‑chain: Token positions from Mantle vault/pool contracts via RPC.
+
+Oracle prices: Direct from Mantle oracles (API3, Pyth, etc.).
+
+Off‑chain: FX rates, fees, cash balances via APIs.
+
+Computes NAV and generates AI explanation.
+
+Publishes to NAVRegistry on Mantle via updateNAV(poolId, navValue, meta).
+
+Frontend reads from contract for real‑time display.
 ## 🚀 Features
 
 - **70 Active Mantle Assets**: Real-time tracking of native tokens, wrapped assets, stablecoins, DeFi tokens, and more
