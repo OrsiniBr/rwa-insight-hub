@@ -375,6 +375,217 @@ CREATE INDEX idx_nav_history_time ON nav_history(recorded_at DESC);
 CREATE INDEX idx_price_data_symbol ON price_data(symbol);
 CREATE INDEX idx_price_data_time ON price_data(recorded_at DESC);
 ```
+## ⛓️ Smart Contracts
+
+### Repository Structure
+
+The smart contracts are located in the [`blockchain/`](./blockchain) folder:
+
+```
+blockchain/
+├── src/                    # Smart contract source files
+│   └── Counter.sol         # Base counter contract for NAV tracking
+├── script/                 # Deployment scripts
+│   └── Counter.s.sol       # Counter deployment script
+├── test/                   # Test files
+│   └── Counter.t.sol       # Counter unit tests
+├── lib/                    # Dependencies (forge-std)
+├── foundry.toml           # Foundry configuration
+└── README.md              # Smart contract documentation
+```
+
+### Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Frontend (React + TypeScript)"
+        UI[RWA NAV Dashboard]
+        API[Price API Client]
+        WS[WebSocket Client]
+    end
+    
+    subgraph "Data Sources"
+        CG[CoinGecko API]
+        GT[Gate.io API]
+        DL[DeFiLlama API]
+    end
+    
+    subgraph "Mantle Network (Chain ID: 5000)"
+        RPC[Mantle RPC]
+        EXP[Mantle Explorer API]
+        
+        subgraph "Smart Contracts"
+            NAV[NAV Registry Contract]
+            CTR[Counter.sol]
+            STK[Quest Staking]
+        end
+    end
+    
+    subgraph "Backend (Node.js)"
+        SRV[API Server]
+        WSS[WebSocket Server]
+        DB[(PostgreSQL)]
+        CRON[Cron Jobs]
+    end
+    
+    UI --> API
+    UI --> WS
+    API --> SRV
+    WS --> WSS
+    
+    SRV --> CG
+    SRV --> GT
+    SRV --> DL
+    SRV --> RPC
+    SRV --> EXP
+    SRV --> DB
+    
+    CRON --> SRV
+    
+    RPC --> NAV
+    RPC --> CTR
+    RPC --> STK
+    
+    WSS --> DB
+```
+
+### Contract: Counter.sol
+
+Base utility contract for on-chain NAV tracking and verification.
+
+**Source Code:** [`blockchain/src/Counter.sol`](./blockchain/src/Counter.sol)
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+contract Counter {
+    uint256 public number;
+
+    function setNumber(uint256 newNumber) public {
+        number = newNumber;
+    }
+
+    function increment() public {
+        number++;
+    }
+}
+```
+
+**Contract Functions:**
+
+| Function | Description | Parameters | Returns |
+|----------|-------------|------------|---------|
+| `setNumber(uint256)` | Set the counter to a specific value | `newNumber` - The value to set | void |
+| `increment()` | Increment the counter by 1 | None | void |
+| `number()` | Get the current counter value | None | `uint256` |
+
+### Deployment Script
+
+**Source Code:** [`blockchain/script/Counter.s.sol`](./blockchain/script/Counter.s.sol)
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+import {Script, console} from "forge-std/Script.sol";
+import {Counter} from "../src/Counter.sol";
+
+contract CounterScript is Script {
+    Counter public counter;
+
+    function setUp() public {}
+
+    function run() public {
+        vm.startBroadcast();
+        counter = new Counter();
+        vm.stopBroadcast();
+    }
+}
+```
+
+### Test Suite
+
+**Source Code:** [`blockchain/test/Counter.t.sol`](./blockchain/test/Counter.t.sol)
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+import {Test, console} from "forge-std/Test.sol";
+import {Counter} from "../src/Counter.sol";
+
+contract CounterTest is Test {
+    Counter public counter;
+
+    function setUp() public {
+        counter = new Counter();
+        counter.setNumber(0);
+    }
+
+    function test_Increment() public {
+        counter.increment();
+        assertEq(counter.number(), 1);
+    }
+
+    function testFuzz_SetNumber(uint256 x) public {
+        counter.setNumber(x);
+        assertEq(counter.number(), x);
+    }
+}
+```
+
+### Smart Contract Development
+
+```bash
+# Navigate to blockchain folder
+cd blockchain
+
+# Install dependencies
+forge install
+
+# Build contracts
+forge build
+
+# Run tests
+forge test
+
+# Run tests with verbosity
+forge test -vvv
+
+# Deploy to Mantle Mainnet
+forge script script/Counter.s.sol:CounterScript \
+    --rpc-url https://rpc.mantle.xyz \
+    --private-key $PRIVATE_KEY \
+    --broadcast
+
+# Deploy to Mantle Testnet
+forge script script/Counter.s.sol:CounterScript \
+    --rpc-url https://rpc.sepolia.mantle.xyz \
+    --private-key $PRIVATE_KEY \
+    --broadcast
+```
+
+### Gas Report
+
+```
+| src/Counter.sol:Counter contract |                 |       |        |       |         |
+|----------------------------------|-----------------|-------|--------|-------|---------|
+| Deployment Cost                  | Deployment Size |       |        |       |         |
+| 67017                            | 268             |       |        |       |         |
+| Function Name                    | min             | avg   | median | max   | # calls |
+| increment                        | 43394           | 43394 | 43394  | 43394 | 1       |
+| number                           | 283             | 283   | 283    | 283   | 1       |
+| setNumber                        | 23516           | 23516 | 23516  | 23516 | 2       |
+```
+
+
+
+
+
+
+
+
 
 ### Environment Variables
 
